@@ -11,6 +11,9 @@ import userRoutes from "./routes/userRoutes.js";
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 
+// Render / Heroku / etc. sit behind a reverse proxy. Required for express-rate-limit.
+app.set("trust proxy", 1);
+
 // Global rate limit — all routes
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
