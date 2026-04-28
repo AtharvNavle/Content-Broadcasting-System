@@ -4,6 +4,18 @@ Backend implementation of a school content broadcasting system where teachers up
 
 ---
 
+## Live Demo
+
+| Resource | URL |
+|---|---|
+| **Live API** | https://content-broadcasting-system-6n6x.onrender.com |
+| **Interactive Swagger Docs** | https://content-broadcasting-system-6n6x.onrender.com/api-docs |
+| **Health Check** | https://content-broadcasting-system-6n6x.onrender.com/ |
+
+Hosted on Render's free tier — the first request after ~15 minutes of inactivity may take 30 seconds to spin up; subsequent requests are instant.
+
+---
+
 ## Tech Stack
 
 - **Runtime:** Node.js (v18+ recommended)
