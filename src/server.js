@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./utils/swagger.js";
+import { getSwaggerSpec } from "./utils/swagger.js";
 import routes from "./routes/index.js";
 import authRoutes from "./routes/authRoutes.js";
 import contentRoutes from "./routes/contentRoutes.js";
@@ -34,7 +34,14 @@ const liveLimiter = rateLimit({
 
 app.use(express.json());
 app.use(globalLimiter);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get("/api-docs/swagger.json", (_req, res) => res.json(getSwaggerSpec()));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(null, {
+    swaggerOptions: { url: "/api-docs/swagger.json" },
+  })
+);
 app.use("/content/live", liveLimiter);
 app.use("/content", contentRoutes);
 app.use("/auth", authRoutes);
