@@ -1,0 +1,66 @@
+Authentication & RBAC flow
+- Register endpoint creates teacher or principal users; passwords are hashed with bcrypt before storing.
+- Login endpoint validates credentials and returns a JWT containing userId and role.
+- Protected routes use auth middleware to verify the JWT and attach the decoded user to req.user.
+- Role middleware enforces route-level permissions (teacher-only or principal-only) on every protected route.
+
+Subject-based system design
+- Each content record belongs to exactly one subject and one uploader (teacher).
+- The live API computes rotation independently per subject — math and science rotate on their own clocks.
+- An optional subject filter is supported on the live API via a query parameter.
+
+Upload handling approach
+- Upload uses multer for multipart parsing.
+- Storage backend is selected at startup based on environment variables:
+  - If AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_BUCKET_NAME are set → files are streamed directly to S3 via multer-s3, and the public S3 URL is stored in the database.
+  - Otherwise → files are written to local disk under uploads/ with a timestamp filename.
+- Allowed mime types: JPG, PNG, GIF only — others are rejected with 400.
+- Max file size: 10 MB — larger files are rejected with 400.
+- Required upload fields: title, subject, file. Optional: description, start_time, end_time, rotation_duration.
+
+Approval workflow design
+- Teacher uploads always create content with status = pending.
+- Principal can list all content or only pending content (with filters and pagination).
+- Approve and reject actions only succeed when the content is currently pending — already-approved or already-rejected items return 404.
+- Reject requires a reason; approval clears any prior rejection_reason.
+
+Scheduling / rotation logic (most important)
+- The live API selects only approved content for the requested teacher whose current time is within start_time and end_time.
+- The query joins content_schedule and content_slots so that content without a valid schedule is excluded.
+- For each subject:
+  - The total cycle duration is computed from the sum of item durations.
+  - The current time in minutes (epoch / 60) is taken modulo the total cycle to get a position.
+  - Items are walked cumulatively until position < cumulative duration → that item is the active one.
+- Looping is continuous and infinite because modulo wraps automatically — no background job or DB write is needed for rotation.
+- Edge cases (no content, invalid teacher id, missing schedule, expired window) return an empty object {} instead of throwing errors.
+
+Database design decisions
+- users: identity, role enum (teacher/principal), bcrypt password hash, created_at.
+- content: full lifecycle metadata — title, description, subject, file_path, file_type, file_size, uploaded_by, status, rejection_reason, approved_by, approved_at, start_time, end_time, created_at.
+- content_slots: one row per subject (subject is unique). Acts as a subject-level broadcast channel.
+- content_schedule: links a content row to a slot with rotation_order and duration. Foreign keys cascade on delete.
+- Indexes on content.status, content.uploaded_by, content.subject, and (start_time, end_time) for fast live-query filtering.
+
+Folder structure
+- controllers: request handling and response shaping.
+- routes: endpoint registration, middleware chaining, and Swagger JSDoc annotations.
+- services: reusable business logic (auth register/login).
+- middlewares: authMiddleware, roleMiddleware, uploadMiddleware.
+- models: reserved for future model abstractions (kept as a placeholder per assignment structure).
+- utils: shared infrastructure (db connection pool, swagger config).
+
+Middleware usage
+- authMiddleware: verifies bearer token, rejects with 401 if missing or invalid.
+- roleMiddleware: rejects with 403 if req.user.role does not match required role.
+- uploadMiddleware: validates file type and size, routes to S3 or local disk based on env config.
+- globalLimiter: rate limit of 100 requests per 15 minutes across all routes.
+- liveLimiter: stricter limit of 30 requests per minute on /content/live (the public student endpoint).
+- Express error-handling middleware converts multer errors into clean 400 responses.
+
+Scalability approach
+- Cloud file storage via S3 is already wired (replaces local disk when env vars are set), enabling horizontal scaling.
+- Live endpoint can be cached (e.g. Redis) per teacher with a short TTL — current implementation is read-only and side-effect free, so caching is straightforward to add.
+- Approval and upload notifications could be moved to a queue worker (e.g. BullMQ) without changing API contracts.
+- Rate limiting protects both the global API surface and the public live endpoint specifically.
+- Database indexes are defined on the columns most relevant to the live query (status, uploaded_by, subject, time window).
+- Pagination is applied to all list endpoints to prevent unbounded result sets.

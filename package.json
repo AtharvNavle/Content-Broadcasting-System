@@ -1,7 +1,7 @@
 {
   "name": "content-broadcasting-system-backend",
   "version": "1.0.0",
-  "description": "Minimal Express backend scaffold",
+  "description": "Content Broadcasting System - Backend Assignment",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
@@ -9,7 +9,17 @@
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "@aws-sdk/client-s3": "^3.1037.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.4.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "multer-s3": "^3.0.1",
+    "pg": "^8.20.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

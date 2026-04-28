@@ -17,6 +17,7 @@ pnpm-debug.log*
 dist/
 build/
 coverage/
+uploads/
 
 # OS / editor files
 .DS_Store

@@ -1,0 +1,238 @@
+{
+  "info": {
+    "name": "Content Broadcasting System Backend",
+    "_postman_id": "5a8d4f55-9574-43fc-ab6e-8012c06d6ca7",
+    "description": "API collection for the Content Broadcasting System assignment. Set baseUrl, then login as teacher/principal to populate token and principalToken variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": ["{{baseUrl}}"],
+          "path": [""]
+        }
+      }
+    },
+    {
+      "name": "Auth - Register Teacher",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Teacher\",\n  \"email\": \"teacher@test.com\",\n  \"password\": \"password123\",\n  \"role\": \"teacher\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Register Principal",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Principal\",\n  \"email\": \"principal@test.com\",\n  \"password\": \"password123\",\n  \"role\": \"principal\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Login Teacher",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"teacher@test.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Login Principal",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"principal@test.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Users - Me",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/users/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["users", "me"]
+        }
+      }
+    },
+    {
+      "name": "Content - Upload (Teacher)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "title", "value": "Algebra Quiz", "type": "text" },
+            { "key": "subject", "value": "maths", "type": "text" },
+            { "key": "description", "value": "Weekly algebra test", "type": "text" },
+            { "key": "start_time", "value": "{{today}}T00:00:00", "type": "text" },
+            { "key": "end_time", "value": "{{today}}T23:59:00", "type": "text" },
+            { "key": "rotation_duration", "value": "5", "type": "text" },
+            { "key": "file", "type": "file", "src": "" }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/content/upload",
+          "host": ["{{baseUrl}}"],
+          "path": ["content", "upload"]
+        }
+      }
+    },
+    {
+      "name": "Content - My (Teacher) with filters",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/content/my?subject=maths&status=approved&page=1&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["content", "my"],
+          "query": [
+            { "key": "subject", "value": "maths" },
+            { "key": "status", "value": "approved" },
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Content - Save Schedule (Teacher)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"duration\": 5,\n  \"rotation_order\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/content/:id/schedule",
+          "host": ["{{baseUrl}}"],
+          "path": ["content", ":id", "schedule"]
+        }
+      }
+    },
+    {
+      "name": "Content - All (Principal) with filters",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{principalToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/content/all?status=approved&page=1&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["content", "all"],
+          "query": [
+            { "key": "status", "value": "approved" },
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Content - Pending (Principal)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{principalToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/content/pending",
+          "host": ["{{baseUrl}}"],
+          "path": ["content", "pending"]
+        }
+      }
+    },
+    {
+      "name": "Content - Approve (Principal)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{principalToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/content/:id/approve",
+          "host": ["{{baseUrl}}"],
+          "path": ["content", ":id", "approve"]
+        }
+      }
+    },
+    {
+      "name": "Content - Reject (Principal)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{principalToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reason\": \"Incomplete content\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/content/:id/reject",
+          "host": ["{{baseUrl}}"],
+          "path": ["content", ":id", "reject"]
+        }
+      }
+    },
+    {
+      "name": "Content - Live by Teacher (Public)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/content/live/:teacherId?subject=maths",
+          "host": ["{{baseUrl}}"],
+          "path": ["content", "live", ":teacherId"],
+          "query": [{ "key": "subject", "value": "maths" }]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "today", "value": "2026-04-28", "description": "Update to today's date for upload" },
+    { "key": "token", "value": "", "description": "JWT from teacher login" },
+    { "key": "principalToken", "value": "", "description": "JWT from principal login" }
+  ]
+}
