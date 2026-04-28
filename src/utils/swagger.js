@@ -10,8 +10,8 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
-        description: "Local server",
+        url: "/",
+        description: "Current host (works for both local and deployed)",
       },
     ],
     components: {
